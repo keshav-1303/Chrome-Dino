@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Dinosaur Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background-color: #f7f7f7;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 300px;
+            border-bottom: 2px solid #333;
+            overflow: hidden;
+            background-color: white;
+        }
+        
+        #dino {
+            position: absolute;
+            width: 60px;
+            height: 70px;
+            bottom: 0;
+            left: 50px;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cGF0aCBmaWxsPSIjNTU1NTU1IiBkPSJNODAsMTkwIEwxNDUsMTkwIEwxNDUsMTcwIEwxNTUsMTcwIEwxNTUsMTYwIEwxNjUsMTYwIEwxNjUsMTUwIEwxNzUsMTUwIEwxNzUsMTQwIEwxODAsMTQwIEwxODAsMTMwIEwxODUsMTMwIEwxODUsMTIwIEwxNzUsMTIwIEwxNzUsMTMwIEwxNzAsMTMwIEwxNzAsMTQwIEwxNjUsMTQwIEwxNjUsMTMwIEwxNzAsMTMwIEwxNzAsMTIwIEwxNjUsMTIwIEwxNjUsMTEwIEwxNjAsMTEwIEwxNjAsMTAwIEwxNTUsMTAwIEwxNTUsOTAgTDE1MCw5MCBMMTQ1LDkwIEwxNDUsODAgTDE0MCw4MCBMMTQwLDcwIEwxMzUsNzAgTDEzNSw1MCBMMTQ1LDUwIEwxNDUsNDAgTDE0MCw0MCBMMTM1LDQwIEwxMzUsMzAgTDEzMCwzMCBMMTMwLDIwIEwxMDAsMjAgTDEwMCwxMCBMMTEwLDEwIEwxMTAsMCBMMTAwLDAgTDkwLDAgTDkwLDEwIEw4MCwxMCBMODAsMjAgTDUwLDIwIEw1MCwzMCBMNDAsMzAgTDQwLDUwIEw1MCw1MCBMNTAsNjAgTDYwLDYwIEw2MCw3MCBMNDAsNzAgTDQwLDgwIEwzMCw4MCBMMzAsOTAgTDIwLDkwIEwyMCwxMDAgTDEwLDEwMCBMMTAsMTEwIEwwLDExMCBMMCwxMzAgTDEwLDEzMCBMMTAsMTQwIEwyMCwxNDAgTDIwLDE1MCBMMzAsMTUwIEwzMCwxNjAgTDQwLDE2MCBMNDAsMTcwIEw1MCwxNzAgTDUwLDE4MCBMODAsMTgwIEw4MCwxOTBaIi8+PC9zdmc+');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .obstacle {
+            position: absolute;
+            width: 50px;
+            height: 100px;
+            bottom: 0;
+            right: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMzAwIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBkPSJNOTAsMyBMMTAwLDMgTDEwMCwwIEwxMTAsMCBMMTEwLDEwIEwxMTUsMTAgTDExNSwyMCBMMTEwLDIwIEwxMTAsMzAgTDEyMCwzMCBMMTIwLDQwIEwxMzAsNDAgTDEzMCw1MCBMMTQwLDUwIEwxNDAsNjAgTDEzMCw2MCBMMTMwLDcwIEwxMjAsNzAgTDEyMCw4MCBMMTQwLDgwIEwxNDAsOTAgTDEzMCw5MCBMMTMwLDEwMCBMMTIwLDEwMCBMMTIwLDEzMCBMMTMwLDEzMCBMMTMwLDE0MCBMMTQwLDE0MCBMMTQwLDE1MCBMMTMwLDE1MCBMMTMwLDE2MCBMMTIwLDE2MCBMMTIwLDE3MCBMMTMwLDE3MCBMMTMwLDE4MCBMMTQwLDE4MCBMMTQwLDE5MCBMMTUwLDE5MCBMMTUwLDIwMCBMMTYwLDIwMCBMMTYwLDI1MCBMMTcwLDI1MCBMMTcwLDI2MCBMMTYwLDI2MCBMMTYwLDI5MCBMMTUwLDI5MCBMMTUwLDMwMCBMMTQwLDMwMCBMMzAsMzAwIEwzMCwyOTAgTDIwLDI5MCBMMjAsMjgwIEwxMCwyODAgTDEwLDI3MCBMMCwyNzAgTDAsMjYwIEwxMCwyNjAgTDEwLDI1MCBMMjAsMjUwIEwyMCwyNDAgTDMwLDI0MCBMMzAsMjMwIEw0MCwyMzAgTDQwLDIyMCBMNTAsMjIwIEw1MCwyMTAgTDQwLDIxMCBMNDAsMjAwIEw1MCwyMDAgTDUwLDE5MCBMNjAsMTkwIEw2MCwxODAgTDUwLDE4MCBMNTAsMTcwIEw2MCwxNzAgTDYwLDE2MCBMNTAsMTYwIEw1MCwxNTAgTDYwLDE1MCBMNjAsMTQwIEw3MCwxNDAgTDcwLDEzMCBMODAsMTMwIEw4MCwxMjAgTDcwLDEyMCBMNzAsMTEwIEw2MCwxMTAgTDYwLDkwIEw3MCw5MCBMNzAsODAgTDgwLDgwIEw4MCw3MCBMNzAsNzAgTDcwLDYwIEw4MCw2MCBMODAsNTAgTDkwLDUwIEw5MCwzWiIvPjwvc3ZnPg==');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        #score {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #555;
+        }
+
+        /* Ground elements */
+        .ground-line {
+            position: absolute;
+            height: 2px;
+            background-color: #999;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chrome Dinosaur Game</h1>
+    <div id="game-container">
+        <div id="dino"></div>
+        <div id="game-over">Game Over! Press Space to Restart</div>
+    </div>
+    <div id="score">Score: 0</div>
+    <button id="start-btn">Start Game</button>
+    
+    <script>
+        // Game elements
+        const dino = document.getElementById('dino');
+        const gameContainer = document.getElementById('game-container');
+        const scoreElement = document.getElementById('score');
+        const gameOverElement = document.getElementById('game-over');
+        const startButton = document.getElementById('start-btn');
+        
+        // Game variables
+        let isJumping = false;
+        let isGameOver = false;
+        let score = 0;
+        let gameSpeed = 6;
+        let obstacleInterval;
+        let scoreInterval;
+        
+        // Create ground lines
+        function createGroundLines() {
+            // Create random scattered ground lines like in the original game
+            const lines = [
+                { width: 20, left: 100 },
+                { width: 30, left: 200 },
+                { width: 10, left: 350 },
+                { width: 25, left: 500 },
+                { width: 15, left: 650 },
+                { width: 8, left: 750 }
+            ];
+            
+            lines.forEach(line => {
+                const groundLine = document.createElement('div');
+                groundLine.classList.add('ground-line');
+                groundLine.style.width = line.width + 'px';
+                groundLine.style.left = line.left + 'px';
+                gameContainer.appendChild(groundLine);
+            });
+        }
+        
+        // Jump function - FASTER JUMP
+        function jump() {
+            if (isJumping || isGameOver) return;
+            
+            isJumping = true;
+            let jumpHeight = 0;
+            let jumpUp = true;
+            
+            const jumpInterval = setInterval(() => {
+                if (jumpUp) {
+                    // Faster upward movement: 10px instead of 5px
+                    jumpHeight += 10;
+                    if (jumpHeight >= 130) jumpUp = false;
+                } else {
+                    // Faster downward movement: 8px instead of 5px
+                    jumpHeight -= 8;
+                    if (jumpHeight <= 0) {
+                        clearInterval(jumpInterval);
+                        isJumping = false;
+                        jumpHeight = 0;
+                    }
+                }
+                
+                dino.style.bottom = jumpHeight + 'px';
+            }, 15); // Faster interval: 15ms instead of 20ms
+        }
+        
+        // Create obstacle
+        function createObstacle() {
+            if (isGameOver) return;
+            
+            const obstacle = document.createElement('div');
+            obstacle.classList.add('obstacle');
+            
+            // Randomize obstacle scale (a bit)
+            const scale = (Math.random() * 0.3) + 0.8; // Scale between 0.8 and 1.1
+            obstacle.style.transform = `scaleX(${scale}) scaleY(${scale})`;
+            
+            gameContainer.appendChild(obstacle);
+            
+            let obstaclePosition = gameContainer.offsetWidth;
+            
+            const moveObstacle = setInterval(() => {
+                if (obstaclePosition < -60) {
+                    // Obstacle passed, remove it
+                    clearInterval(moveObstacle);
+                    obstacle.remove();
+                } else if (
+                    obstaclePosition > 30 && 
+                    obstaclePosition < 110 && 
+                    dino.offsetTop + dino.offsetHeight > gameContainer.offsetHeight - 100
+                ) {
+                    // Collision detected
+                    gameOver();
+                    clearInterval(moveObstacle);
+                } else {
+                    // Move obstacle
+                    obstaclePosition -= gameSpeed;
+                    obstacle.style.right = gameContainer.offsetWidth - obstaclePosition + 'px';
+                }
+            }, 16); // Smoother animation
+        }
+        
+        // Update score
+        function updateScore() {
+            score++;
+            scoreElement.textContent = `Score: ${score}`;
+            
+            // Increase game speed every 100 points
+            if (score % 100 === 0) {
+                gameSpeed += 0.5;
+            }
+        }
+        
+        // Game over function
+        function gameOver() {
+            isGameOver = true;
+            gameOverElement.style.display = 'block';
+            clearInterval(obstacleInterval);
+            clearInterval(scoreInterval);
+        }
+        
+        // Start game function
+        function startGame() {
+            // Reset game state
+            isGameOver = false;
+            score = 0;
+            gameSpeed = 6;
+            scoreElement.textContent = 'Score: 0';
+            gameOverElement.style.display = 'none';
+            
+            // Remove any existing obstacles
+            document.querySelectorAll('.obstacle').forEach(obs => obs.remove());
+            
+            // Reset dino position
+            dino.style.bottom = '0px';
+            
+            // Create ground lines
+            createGroundLines();
+            
+            // Start creating obstacles - slightly faster spawn rate
+            obstacleInterval = setInterval(createObstacle, 1300);
+            
+            // Start scoring
+            scoreInterval = setInterval(updateScore, 100);
+            
+            // Hide the start button
+            startButton.style.display = 'none';
+        }
+        
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp') && !isGameOver) {
+                jump();
+            }
+            
+            if ((e.code === 'Space' || e.key === ' ') && isGameOver) {
+                startGame();
+            }
+        });
+        
+        gameContainer.addEventListener('click', () => {
+            if (!isGameOver) {
+                jump();
+            } else {
+                startGame();
+            }
+        });
+        
+        startButton.addEventListener('click', startGame);
+        
+        // Add ground lines when page loads
+        createGroundLines();
+    </script>
+</body>
+</html>
